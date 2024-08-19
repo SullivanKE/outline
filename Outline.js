@@ -243,7 +243,7 @@ export default class Outline {
       options = {
         root: this.#doc,
         rootMargin: "0px",
-        threshold: 1.0,
+        threshold: 0.1,
       };
     const intersectionObserver = new IntersectionObserver(fn, options);
     this.#items.map((item) => {
@@ -257,9 +257,13 @@ export default class Outline {
   /**
    * Clears the styles of all outline items in the document.
    */
-  clearAllActive() {
-    this.#doc.querySelectorAll(".outline-item-active").forEach((item) => {
-      item.classList.remove("outline-item-active");
+  clearAllActive(classList = ".outline-item-active", doc = this.#doc) {
+    const classes = classList
+      .split(".")
+      .filter((item) => item.trim().length > 0);
+
+    doc.querySelectorAll(classList).forEach((item) => {
+      classes.forEach((className) => item.classList.remove(className));
     });
   }
 }
