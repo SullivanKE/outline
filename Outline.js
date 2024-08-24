@@ -45,7 +45,6 @@ export default class Outline {
     let selectors = Array.from(arguments).map((arg) =>
       arg.toLowerCase().trim()
     );
-    console.log(selectors);
 
     // Take a comma separated string of html selectors
     const elems = [...this.#doc.querySelectorAll(selectors.join(","))];
