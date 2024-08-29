@@ -1,6 +1,8 @@
 # Outline Component
 ## Overview
-The Outline Component is a versatile tool that reads the content of an HTML page and generates a dynamic sidebar navigation. This sidebar is built based on the query selectors you pass in, allowing for flexible and customizable navigation structures. Perfect for enhancing the user experience on content-heavy websites or documentation pages.
+The Outline Component generates a list of the important sections of the HTML on your webpage. This sidebar is built based on the query selectors you pass in, allowing for flexible and customizable navigation structures. Perfect for enhancing the user experience on content-heavy websites or documentation pages.
+
+![Outline Example](outline-example.PNG "Outline Example")
 
 ## Features
 
@@ -32,37 +34,56 @@ import Outline from '@ocdla/Outline';
 
 // You can create an outline from the full document, or by specifying a parent element to get a more specific section.
 const outline = Outline.fromCurrentDocument();
-const bodyOutline = new Outline(document.querySelector('#body');
+const bodyOutline = new Outline(document.querySelector('#body'));
 
-// Content is in section tags with class names .level1, .level2, etc. The order here matters, as the first arguments passed in are considered closer to root level.
+// You can pass in any valid CSS query selectors. The order here matters, as the first arguments passed in are considered closer to root level.
 outline.outline(
-  ".level1",
-  ".level2",
-  ".level3",
-  ".level4",
-  ".level5",
-  ".level6"
+  "h1",
+  "h2",
+  "h3",
+  "h4"
 );
-
-// Returns an array of nested outline item objects, each nested in the 'children' instance array of their parent
-// This would be used if you're using some form of JSX or you had more manipulation to perform.
-outline.getNested();
-
-// Returns a flat array of outline items without nesting
-outline.getFlattened();
 
 // Returns a parent <ul> object that contains a <li> entry for each outline item with nested <ul> elements for any indentation
 outline.toNodeTree();
 
+// Counter intuitive example
+outline.outline(
+  "h4",
+  ".subsection",
+  "h3",
+  "h1"
+);
+
+// Returns an array of nested outline item objects, each nested in the 'children' instance array of their parent
+// This would be used if you're using some form of JSX or you had more manipulation to perform.
+const nestedOutline = outline.getNested();
+
+// Returns an unstructured one dimensional array of outline item objects
+const flatOutline = outline.getFlattened();
+
 // Returns a string of HTML as if you used outline.toNodeTree();
-outline.toHtml();
+const stringOutline = outline.toHtml();
 
 ```
 
-### Intersection Observers
+```html
+<ul>
+  <li>Citrus</li>
+  <li>
+  <ul>
+    <li>Orange</li>
+    <li>Lemon</li>
+  </ul>
+  </li>
+  <li>Vegetables</li>
+</ul>
+```
 
-Intersection observers are used to create an interactive outline that highlights the section you have scrolled to. This is done by passing a callback function to `outline.addIntersectionObserver()`
-For more information on intersection observers, see the MDN documentation here: https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver
+### Dynamic highlighting
+
+Dynamic highlighting is accomplished via the [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver) through the `Outline.addIntersectionObserver()` method.
+In the example below, an IntersectionObserver is used to create an interactive outline that highlights outline items as their respective sections are scrolled to.
 
 ```javascript
  // Callback function used to detect where the user is on the page.
@@ -75,12 +96,6 @@ For more information on intersection observers, see the MDN documentation here: 
         // Make sure we have at least one entry remaining
         if (intersectingEntries.length == 0) return;
 
-        // Iterate through our outline items and clear their styles.
-        outline.clearAllActive(
-          ".bg-black.text-white",
-          document.querySelector("#outline")
-        );
-
         // We only want the first entry. It's possible to scroll through multiple headings at once.
         const entry = intersectingEntries[0];
         const id = entry.target.id;
@@ -92,10 +107,6 @@ For more information on intersection observers, see the MDN documentation here: 
           block: "nearest",
           inline: "center",
         });
-
-        // Add the active class styling to the current item.
-        outlineListItem.classList.add("bg-black");
-        outlineListItem.classList.add("text-white");
       };
 
       // Add the callback function to the intersection observer.
