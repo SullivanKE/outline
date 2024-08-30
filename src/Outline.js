@@ -1,4 +1,4 @@
-import OutlineItem from "./Item.js";
+import OutlineItem from "./OutlineItem.js";
 export default class Outline {
   // The outline class takes in document from which the outline will be built.
   #doc;
